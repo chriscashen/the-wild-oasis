@@ -1,5 +1,8 @@
 import styled from "styled-components";
-import {formatCurrency} from "../../utils/helpers";
+import { useState } from "react";
+import { formatCurrency } from "../../utils/helpers";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteCabin } from "../../services/apiCabins";
 
 const TableRow = styled.div`
   display: grid;
@@ -7,6 +10,9 @@ const TableRow = styled.div`
   column-gap: 2.4rem;
   align-items: center;
   padding: 1.4rem 2.4rem;
+  &:hover { 
+    background-color: var(--color-grey-100);
+  }
 
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
@@ -27,6 +33,7 @@ const Cabin = styled.div`
   font-weight: 600;
   color: var(--color-grey-600);
   font-family: "Sono";
+  
 `;
 
 const Price = styled.div`
@@ -40,20 +47,44 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `;
 
-function CabinRow({cabin}) {
-  const {name, maxCapacity, regularPrice, discount, image} = cabin
-
+function CabinRow({ cabin }) {
+  const {
+    name,
+    maxCapacity,
+    regularPrice,
+    discount,
+    image,
+    id: cabinId,
+  } = cabin;
+  const [isHovered, setIsHovered] = useState(false);
+  const queryClient = useQueryClient();
+  
+  const { isLoading: isDeleting, mutate } = useMutation({
+    mutationFn: deleteCabin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["cabins"],
+      });
+    },
+    onError: err => alert(err.message),
+  });
 
   return (
-    <TableRow role="row">
+    <TableRow
+      role="row"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <img src={image} />
       <Cabin>{name}</Cabin>
       <div>{maxCapacity}</div>
       <Price>{formatCurrency(regularPrice)}</Price>
       <Discount>{formatCurrency(discount)}</Discount>
-      <button>Delete</button>
+      {isHovered && <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
+        Delete
+      </button>}
     </TableRow>
-  )
+  );
 }
 
-export default CabinRow
+export default CabinRow;
