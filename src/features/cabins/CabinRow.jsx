@@ -3,6 +3,7 @@ import { useState } from "react";
 import { formatCurrency } from "../../utils/helpers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteCabin } from "../../services/apiCabins";
+import { toast } from "react-hot-toast";
 
 const TableRow = styled.div`
   display: grid;
@@ -10,7 +11,7 @@ const TableRow = styled.div`
   column-gap: 2.4rem;
   align-items: center;
   padding: 1.4rem 2.4rem;
-  &:hover { 
+  &:hover {
     background-color: var(--color-grey-100);
   }
 
@@ -33,7 +34,6 @@ const Cabin = styled.div`
   font-weight: 600;
   color: var(--color-grey-600);
   font-family: "Sono";
-  
 `;
 
 const Price = styled.div`
@@ -58,15 +58,16 @@ function CabinRow({ cabin }) {
   } = cabin;
   const [isHovered, setIsHovered] = useState(false);
   const queryClient = useQueryClient();
-  
+
   const { isLoading: isDeleting, mutate } = useMutation({
     mutationFn: deleteCabin,
     onSuccess: () => {
+      toast.success("Cabin deleted");
       queryClient.invalidateQueries({
         queryKey: ["cabins"],
       });
     },
-    onError: err => alert(err.message),
+    onError: (err) => toast.error(err.message),
   });
 
   return (
@@ -80,9 +81,13 @@ function CabinRow({ cabin }) {
       <div>{maxCapacity}</div>
       <Price>{formatCurrency(regularPrice)}</Price>
       <Discount>{formatCurrency(discount)}</Discount>
-      {isHovered && <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
+      <button
+        onClick={() => mutate(cabinId)}
+        disabled={isDeleting}
+        hidden={!isHovered}
+      >
         Delete
-      </button>}
+      </button>
     </TableRow>
   );
 }
