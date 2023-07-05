@@ -87,7 +87,7 @@ function CabinRow({ cabin }) {
           <span>&mdash;</span>
         )}
         <div hidden={!isHovered}>
-          <button onClick={handleDuplicate}>copy</button>
+          <button onClick={handleDuplicate} disabled={isCreating}>copy</button>
           <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>
             delete
           </button>
