@@ -80,7 +80,7 @@ function MainNav() {
         <li>
           <StyledNavLink to="/settings">
             <MdOutlineSettings />
-            <span>Bookings</span>
+            <span>Settings</span>
           </StyledNavLink>
         </li>
       </NavList>
