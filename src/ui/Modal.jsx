@@ -1,11 +1,4 @@
-import {
-  cloneElement,
-  createContext,
-  useState,
-  useContext,
-  useEffect,
-  useRef
-} from "react";
+import { cloneElement, createContext, useState, useContext } from "react";
 import { createPortal } from "react-dom";
 import styled from "styled-components";
 import { useOutsideClick } from "../hooks/useOutsideClick";
@@ -74,10 +67,15 @@ function Modal({ children }) {
   );
 }
 
-function Open({ children, opens: opensWindowName }) {
+function Open({ children, opens: opensWindowName, toggle }) {
   const { open } = useContext(ModalContext);
 
-  return cloneElement(children, { onClick: () => open(opensWindowName) });
+  return cloneElement(children, {
+    onClick: () => {
+      open(opensWindowName);
+      toggle();
+    },
+  });
 }
 
 function Window({ children, name }) {
